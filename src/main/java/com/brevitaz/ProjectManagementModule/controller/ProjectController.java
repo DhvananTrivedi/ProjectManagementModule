@@ -1,8 +1,10 @@
 package com.brevitaz.ProjectManagementModule.controller;
 
+import com.brevitaz.ProjectManagementModule.dao.ProjectDao;
 import com.brevitaz.ProjectManagementModule.model.Involvement;
 import com.brevitaz.ProjectManagementModule.model.Project;
 import com.brevitaz.ProjectManagementModule.model.TeamMember;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,26 +19,35 @@ import java.util.List;
 @RequestMapping("/project")
 public class ProjectController {
 
+
+    @Autowired
+    ProjectDao projectDao;
+
     @RequestMapping(method = RequestMethod.POST)
-    boolean add(@RequestBody Project project){
+    public boolean add(@RequestBody Project project){
+        boolean status = projectDao.insert(project);
         System.out.println(" Project added!");
-        return true;
+        return status;
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    List<Project> get()
+    public List<Project> getAll()
     {
+        List<Project> projects = projectDao.getAll();
         System.out.println("View all projects.");
-        return null;
+        return projects;
     }
 
-    @RequestMapping(value="/{projectId}",method = RequestMethod.GET)
-    Project getById(@PathVariable String projectId){
-        return null;
+    @RequestMapping(value="byId/{id}",method = RequestMethod.GET)
+    public Project getById(@PathVariable String id)
+    {
+        Project project = projectDao.getById(id);
+        System.out.println("Project - BY ID");
+        return project;
     }
 
     @RequestMapping(value = "/allocate-employees",method = RequestMethod.POST)
-    boolean allocateEmployees(@RequestBody List employees)
+    public boolean allocateEmployees(@RequestBody List employees)
     {
         System.out.println("Allocating employees to project");
         return true;
@@ -50,7 +61,8 @@ public class ProjectController {
     }
 
     @RequestMapping(value = "/allocated-employees/{projectId}",method = RequestMethod.GET)
-    List<TeamMember>  allocatedEmployees(@PathVariable String projectId){
+    public List<TeamMember>  allocatedEmployees(@PathVariable String projectId)
+    {
         System.out.println("List of allocated employees..");
         return null;
     }
