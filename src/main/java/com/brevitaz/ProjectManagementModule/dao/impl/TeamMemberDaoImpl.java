@@ -1,5 +1,7 @@
 package com.brevitaz.ProjectManagementModule.dao.impl;
 
+import com.brevitaz.ProjectManagementModule.config.ClientConfig;
+import com.brevitaz.ProjectManagementModule.config.ObjectMapperProvider;
 import com.brevitaz.ProjectManagementModule.dao.TeamMemberDao;
 import com.brevitaz.ProjectManagementModule.model.TeamMember;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -37,28 +39,30 @@ public class TeamMemberDaoImpl implements TeamMemberDao {
 
 
     @Autowired
-    RestHighLevelClient client;
+    private ClientConfig client;
 
     @Autowired
-    Environment environment;
+    private Environment environment;
 
-    private ObjectMapper mapper = new ObjectMapper();
+    @Autowired
+    private ObjectMapperProvider mapper ;
 
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(TeamMemberDaoImpl.class);
 
+    private static final String TYPE = "doc";
 
     public boolean insert(TeamMember teamMember ){
 
         IndexRequest request = new IndexRequest(
-                environment.getProperty("elasticsearch.index.teammembers"),environment.getProperty("elasticsearch.type.doc"),teamMember.getId()
-        );
+                environment.getProperty("elasticsearch.index.teammembers"),TYPE,teamMember.getId());
+        mapper.getInstance().setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
         //exec
         try {
 
-            String json = mapper.writeValueAsString(teamMember);
+            String json = mapper.getInstance().writeValueAsString(teamMember);
             request.source(json, XContentType.JSON);
-            IndexResponse response = client.index(request);
+            IndexResponse response = client.getClient().index(request);
             return ((response.status()+"").equals("CREATED")||(response.status()+"").equals("OK"));
 
         } catch (IOException e) {
@@ -71,10 +75,10 @@ public class TeamMemberDaoImpl implements TeamMemberDao {
 
         //init
         DeleteRequest deleteRequest = new DeleteRequest(
-                environment.getProperty("elasticsearch.index.teammembers"), environment.getProperty("elasticsearch.type.doc"), id);
+                environment.getProperty("elasticsearch.index.teammembers"),TYPE, id);
 
         try {
-            DeleteResponse response = client.delete(deleteRequest);
+            DeleteResponse response = client.getClient().delete(deleteRequest);
             LOGGER.info("Delete response status -"+response.status());
             return (response.status() + "").equals("OK");
 
@@ -89,12 +93,13 @@ public class TeamMemberDaoImpl implements TeamMemberDao {
     public TeamMember getById(String id)
     {
         GetRequest request = new GetRequest(
-                environment.getProperty("elasticsearch.index.teammembers"),environment.getProperty("elasticsearch.type.doc"),id
+                environment.getProperty("elasticsearch.index.teammembers"),TYPE,id
+
         );
 
         try {
-            GetResponse getResponse=client.get(request);
-            TeamMember member  = mapper.readValue(getResponse.getSourceAsString(), TeamMember.class);
+            GetResponse getResponse=client.getClient().get(request);
+            TeamMember member  = mapper.getInstance().readValue(getResponse.getSourceAsString(), TeamMember.class);
             return member;
         } catch (IOException e) {
             e.printStackTrace();
@@ -107,15 +112,15 @@ public class TeamMemberDaoImpl implements TeamMemberDao {
 
         List<TeamMember> teamMembers = new ArrayList<>();
         SearchRequest searchRequest = new SearchRequest( environment.getProperty("elasticsearch.index.teammembers"));
-        searchRequest.types(environment.getProperty("elasticsearch.type.doc"));
+        searchRequest.types(TYPE);
 
         try {
-            SearchResponse searchResponse = client.search(searchRequest);
+            SearchResponse searchResponse = client.getClient().search(searchRequest);
             SearchHit[] hits = searchResponse.getHits().getHits();
 
             TeamMember teamMember;
             for (SearchHit hit : hits) {
-                teamMember = mapper.readValue(hit.getSourceAsString(), TeamMember.class);
+                teamMember = mapper.getInstance().readValue(hit.getSourceAsString(), TeamMember.class);
                 teamMembers.add(teamMember);
             }
         } catch (IOException ioe) {
@@ -139,10 +144,10 @@ public class TeamMemberDaoImpl implements TeamMemberDao {
         try {
             searchSourceBuilder.query(matchQueryBuilder);
             request.source(searchSourceBuilder);
-            SearchResponse response = client.search(request);
+            SearchResponse response = client.getClient().search(request);
             SearchHits hits = response.getHits();
             for (SearchHit hit : hits) {
-                TeamMember teamMember = mapper.readValue(hit.getSourceAsString(), TeamMember.class);
+                TeamMember teamMember = mapper.getInstance().readValue(hit.getSourceAsString(), TeamMember.class);
                 System.out.println(teamMember);
                 teamMembers.add(teamMember);
             }
@@ -158,16 +163,16 @@ public class TeamMemberDaoImpl implements TeamMemberDao {
 
         // init
         UpdateRequest request = new UpdateRequest(
-                environment.getProperty("elasticsearch.index.teammembers"),environment.getProperty("elasticsearch.type.doc"),id);
-        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+                environment.getProperty("elasticsearch.index.teammembers"),TYPE,id);
+        mapper.getInstance().setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
         //exec
         try {
 
             System.out.println("HELLO");
-            String json = mapper.writeValueAsString(teamMember);
+            String json = mapper.getInstance().writeValueAsString(teamMember);
             request.doc(json,XContentType.JSON);
-            UpdateResponse response = client.update(request);
+            UpdateResponse response = client.getClient().update(request);
             return (""+response.status()).equals("OK");
         } catch (IOException e) {
             e.printStackTrace();

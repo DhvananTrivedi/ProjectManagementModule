@@ -17,7 +17,6 @@ public class InvolvementDaoImplTest {
     @Autowired
     InvolvementDao involvementDao;
 
-
     @Test
     public void testInsert() {
 
@@ -67,14 +66,14 @@ public class InvolvementDaoImplTest {
 
         Involvement involvement1 = new Involvement();
         involvement1.setInvolvementPercentage(30);
-        involvement1.setId("1144");
-        boolean status1 = involvementDao.update(null, involvement1);
+        boolean status1 = involvementDao.update("1144", involvement1);
         System.out.println(involvement1);
+        Assert.assertEquals(true,status1);
 
         Involvement involvement2 = involvementDao.getById("1144");
+        System.out.println(involvement2);
         Assert.assertEquals("1144",involvement2.getId());
-        Assert.assertEquals(25,involvement2.getInvolvementPercentage());
-
+        Assert.assertEquals(30,involvement2.getInvolvementPercentage());
         boolean status2 = involvementDao.delete("1144");
         Assert.assertEquals(true,status2);
     }

@@ -1,5 +1,7 @@
 package com.brevitaz.ProjectManagementModule.dao.impl;
 
+import com.brevitaz.ProjectManagementModule.config.ClientConfig;
+import com.brevitaz.ProjectManagementModule.config.ObjectMapperProvider;
 import com.brevitaz.ProjectManagementModule.dao.TeamLeaderDao;
 import com.brevitaz.ProjectManagementModule.model.TeamLeader;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -36,25 +38,30 @@ public class TeamLeaderDaoImpl implements TeamLeaderDao{
 
 
     @Autowired
-    RestHighLevelClient client;
+    private ClientConfig client;
 
     @Autowired
-    Environment environment;
+    private Environment environment;
 
-    private ObjectMapper mapper = new ObjectMapper();
+    @Autowired
+    private ObjectMapperProvider mapper;
 
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(ProjectDaoImpl.class);
+
+    private static final String TYPE = "doc";
 
     public boolean insert(TeamLeader teamLeader){
 
         IndexRequest request = new IndexRequest(
-                environment.getProperty("elasticsearch.index.teamleaders"),environment.getProperty("elasticsearch.type.doc"),teamLeader.getId());
+                environment.getProperty("elasticsearch.index.teamleaders"),TYPE,teamLeader.getId());
+
+        mapper.getInstance().setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
         try {
 
-            String json = mapper.writeValueAsString(teamLeader);
+            String json = mapper.getInstance().writeValueAsString(teamLeader);
             request.source(json, XContentType.JSON);
-            IndexResponse response = client.index(request);
+            IndexResponse response = client.getClient().index(request);
             return ((response.status()+"").equals("CREATED")||(response.status()+"").equals("OK"));
 
         } catch (IOException e) {
@@ -67,10 +74,10 @@ public class TeamLeaderDaoImpl implements TeamLeaderDao{
 
         //init
         DeleteRequest deleteRequest = new DeleteRequest(
-                environment.getProperty("elasticsearch.index.teamleaders"), environment.getProperty("elasticsearch.type.doc"), id);
+                environment.getProperty("elasticsearch.index.teamleaders"),TYPE, id);
 
         try {
-            DeleteResponse response = client.delete(deleteRequest);
+            DeleteResponse response = client.getClient().delete(deleteRequest);
             LOGGER.info("Delete response status -"+response.status());
             return (response.status() + "").equals("OK");
 
@@ -85,12 +92,12 @@ public class TeamLeaderDaoImpl implements TeamLeaderDao{
     public TeamLeader getById(String id)
     {
         GetRequest request = new GetRequest(
-                environment.getProperty("elasticsearch.index.teamleaders"),environment.getProperty("elasticsearch.type.doc"),id
+                environment.getProperty("elasticsearch.index.teamleaders"),TYPE,id
         );
 
         try {
-            GetResponse getResponse=client.get(request);
-            TeamLeader teamLeader  = mapper.readValue(getResponse.getSourceAsString(), TeamLeader.class);
+            GetResponse getResponse=client.getClient().get(request);
+            TeamLeader teamLeader  = mapper.getInstance().readValue(getResponse.getSourceAsString(), TeamLeader.class);
             return teamLeader;
         } catch (IOException e) {
             e.printStackTrace();
@@ -103,15 +110,15 @@ public class TeamLeaderDaoImpl implements TeamLeaderDao{
 
         List<TeamLeader> teamLeaders = new ArrayList<>();
         SearchRequest searchRequest = new SearchRequest( environment.getProperty("elasticsearch.index.teamleaders"));
-        searchRequest.types(environment.getProperty("elasticsearch.type.doc"));
+        searchRequest.types(TYPE);
 
         try {
-            SearchResponse searchResponse = client.search(searchRequest);
+            SearchResponse searchResponse = client.getClient().search(searchRequest);
             SearchHit[] hits = searchResponse.getHits().getHits();
 
             TeamLeader teamLeader;
             for (SearchHit hit : hits) {
-                teamLeader = mapper.readValue(hit.getSourceAsString(), TeamLeader.class);
+                teamLeader = mapper.getInstance().readValue(hit.getSourceAsString(), TeamLeader.class);
                 teamLeaders.add(teamLeader);
             }
         } catch (IOException ioe) {
@@ -135,11 +142,11 @@ public class TeamLeaderDaoImpl implements TeamLeaderDao{
         try {
             searchSourceBuilder.query(matchQueryBuilder);
             request.source(searchSourceBuilder);
-            SearchResponse response = client.search(request);
+            SearchResponse response = client.getClient().search(request);
             SearchHits hits = response.getHits();
             for (SearchHit hit : hits) {
 
-                TeamLeader teamLeader = mapper.readValue(hit.getSourceAsString(), TeamLeader.class);
+                TeamLeader teamLeader = mapper.getInstance().readValue(hit.getSourceAsString(), TeamLeader.class);
                 System.out.println(teamLeader);
                 teamLeaders.add(teamLeader);
             }
@@ -154,15 +161,15 @@ public class TeamLeaderDaoImpl implements TeamLeaderDao{
     public boolean update(String id,TeamLeader teamLeader){
 
         UpdateRequest request = new UpdateRequest(
-                environment.getProperty("elasticsearch.index.teamleaders"),environment.getProperty("elasticsearch.type.doc"),id);
-        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+                environment.getProperty("elasticsearch.index.teamleaders"),TYPE,id);
+        mapper.getInstance().setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
         try {
 
             System.out.println("HELLO");
-            String json = mapper.writeValueAsString(teamLeader);
+            String json = mapper.getInstance().writeValueAsString(teamLeader);
             request.doc(json,XContentType.JSON);
-            UpdateResponse response = client.update(request);
+            UpdateResponse response = client.getClient().update(request);
             return (""+response.status()).equals("OK");
         } catch (IOException e) {
             e.printStackTrace();

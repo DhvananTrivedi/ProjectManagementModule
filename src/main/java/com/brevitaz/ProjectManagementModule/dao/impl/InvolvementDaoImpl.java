@@ -1,5 +1,7 @@
 package com.brevitaz.ProjectManagementModule.dao.impl;
 
+import com.brevitaz.ProjectManagementModule.config.ClientConfig;
+import com.brevitaz.ProjectManagementModule.config.ObjectMapperProvider;
 import com.brevitaz.ProjectManagementModule.dao.InvolvementDao;
 import com.brevitaz.ProjectManagementModule.model.Involvement;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -36,26 +38,32 @@ public class InvolvementDaoImpl implements InvolvementDao{
 
 
     @Autowired
-    RestHighLevelClient client;
+    private ClientConfig client;
 
     @Autowired
-    Environment environment;
+    private Environment environment;
 
-    private ObjectMapper mapper = new ObjectMapper();
+    @Autowired
+    private ObjectMapperProvider mapper;
+
 
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(InvolvementDaoImpl.class);
 
+    private static final String TYPE = "doc";
 
     public boolean insert(Involvement involvement){
         IndexRequest request = new IndexRequest(
-                environment.getProperty("elasticsearch.index.involvements"),environment.getProperty("elasticsearch.type.doc"),involvement.getId()
-        );
+                environment.getProperty("elasticsearch.index.involvements"),TYPE,involvement.getId());
+
+        mapper.getInstance().setSerializationInclusion(JsonInclude.Include.NON_NULL);
+
 
         try {
 
-            String json = mapper.writeValueAsString(involvement);
+
+            String json = mapper.getInstance().writeValueAsString(involvement);
             request.source(json, XContentType.JSON);
-            IndexResponse response = client.index(request);
+            IndexResponse response = client.getClient().index(request);
             return ((response.status()+"").equals("CREATED")||(response.status()+"").equals("OK"));
 
         } catch (IOException e) {
@@ -63,14 +71,13 @@ public class InvolvementDaoImpl implements InvolvementDao{
             return false;
         }
     }
-
     public boolean delete(String id){
 
         DeleteRequest deleteRequest = new DeleteRequest(
-                environment.getProperty("elasticsearch.index.involvements"), environment.getProperty("elasticsearch.type.doc"), id);
+                environment.getProperty("elasticsearch.index.involvements"),TYPE, id);
 
         try {
-            DeleteResponse response = client.delete(deleteRequest);
+            DeleteResponse response = client.getClient().delete(deleteRequest);
             LOGGER.info("Delete response status -"+response.status());
             return (response.status() + "").equals("OK");
 
@@ -84,12 +91,12 @@ public class InvolvementDaoImpl implements InvolvementDao{
     public Involvement getById(String id)
     {
         GetRequest request = new GetRequest(
-                environment.getProperty("elasticsearch.index.involvements"),environment.getProperty("elasticsearch.type.doc"),id
+                environment.getProperty("elasticsearch.index.involvements"),TYPE,id
         );
 
         try {
-            GetResponse getResponse=client.get(request);
-            Involvement involvement  = mapper.readValue(getResponse.getSourceAsString(), Involvement.class);
+            GetResponse getResponse=client.getClient().get(request);
+            Involvement involvement  = mapper.getInstance().readValue(getResponse.getSourceAsString(), Involvement.class);
             return involvement;
         } catch (IOException e) {
             e.printStackTrace();
@@ -102,15 +109,15 @@ public class InvolvementDaoImpl implements InvolvementDao{
 
         List<Involvement> involvements = new ArrayList<>();
         SearchRequest searchRequest = new SearchRequest( environment.getProperty("elasticsearch.index.involvements"));
-        searchRequest.types(environment.getProperty("elasticsearch.type.doc"));
+        searchRequest.types(TYPE);
 
         try {
-            SearchResponse searchResponse = client.search(searchRequest);
+            SearchResponse searchResponse = client.getClient().search(searchRequest);
             SearchHit[] hits = searchResponse.getHits().getHits();
 
             Involvement involvement;
             for (SearchHit hit : hits) {
-                involvement = mapper.readValue(hit.getSourceAsString(), Involvement.class);
+                involvement = mapper.getInstance().readValue(hit.getSourceAsString(), Involvement.class);
                 involvements.add(involvement);
             }
         } catch (IOException ioe) {
@@ -120,11 +127,11 @@ public class InvolvementDaoImpl implements InvolvementDao{
     }
 
     public List<Involvement> getByName(String name){
-        ///init
+        //init
         List<Involvement> involvements = new ArrayList<>();
         SearchRequest request = new SearchRequest(
                 environment.getProperty("elasticsearch.index.involvements"));
-        ///request.types(environment.getProperty("request.type"));
+        //request.types(environment.getProperty("request.type"));
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         QueryBuilder matchQueryBuilder = QueryBuilders.matchQuery("name", name)
                 .fuzziness(Fuzziness.AUTO)
@@ -134,11 +141,11 @@ public class InvolvementDaoImpl implements InvolvementDao{
         try {
             searchSourceBuilder.query(matchQueryBuilder);
             request.source(searchSourceBuilder);
-            SearchResponse response = client.search(request);
+            SearchResponse response = client.getClient().search(request);
             SearchHits hits = response.getHits();
             for (SearchHit hit : hits) {
 
-                Involvement involvement = mapper.readValue(hit.getSourceAsString(),Involvement.class);
+                Involvement involvement = mapper.getInstance().readValue(hit.getSourceAsString(),Involvement.class);
                 System.out.println(involvement);
                 involvements.add(involvement);
             }
@@ -154,15 +161,15 @@ public class InvolvementDaoImpl implements InvolvementDao{
 
         // init
         UpdateRequest request = new UpdateRequest(
-                environment.getProperty("elasticsearch.index.involvements"),environment.getProperty("elasticsearch.type.doc"),id);
-        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+                environment.getProperty("elasticsearch.index.involvements"),TYPE,id);
+        mapper.getInstance().setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
         //exec
         try {
 
-            String json = mapper.writeValueAsString(involvement);
+            String json = mapper.getInstance().writeValueAsString(involvement);
             request.doc(json,XContentType.JSON);
-            UpdateResponse response = client.update(request);
+            UpdateResponse response = client.getClient().update(request);
             return (""+response.status()).equals("OK");
         } catch (IOException e) {
             e.printStackTrace();

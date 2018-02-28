@@ -4,10 +4,7 @@ package com.brevitaz.ProjectManagementModule.controller;
 import com.brevitaz.ProjectManagementModule.dao.TeamLeaderDao;
 import com.brevitaz.ProjectManagementModule.dao.impl.TeamLeaderDaoImpl;
 import com.brevitaz.ProjectManagementModule.dao.impl.TeamMemberDaoImpl;
-import com.brevitaz.ProjectManagementModule.model.Involvement;
-import com.brevitaz.ProjectManagementModule.model.Project;
-import com.brevitaz.ProjectManagementModule.model.TeamLeader;
-import com.brevitaz.ProjectManagementModule.model.TeamMember;
+import com.brevitaz.ProjectManagementModule.model.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.slf4j.LoggerFactory;
@@ -25,50 +22,56 @@ public class TeamLeaderController {
     @Autowired
     TeamLeaderDao teamLeaderDao;
 
+    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(TeamLeaderController.class);
+
 
     @RequestMapping(method = RequestMethod.POST)
     public boolean insert(@RequestBody TeamLeader teamLeader) {
         boolean status = teamLeaderDao.insert(teamLeader);
-        System.out.println("Team leader is added successfully !!");
+        LOGGER.info("Teamleader is added successfully !!!");
         return status;
     }
 
 
     @RequestMapping(method = RequestMethod.GET)
-    public List<TeamLeader> getAll() {
-        List<TeamLeader> teamLeaders = teamLeaderDao.getAll();
-        System.out.println("List of all the team leaders in the company.");
-        return teamLeaders;
+    public SearchData getAll() {
+
+        SearchData searchData = new SearchData();
+        searchData.setResponse(teamLeaderDao.getAll());
+        LOGGER.info("All team-leaders are listed !!!");
+        return searchData;
     }
 
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public TeamLeader getById(@PathVariable String id) {
         TeamLeader teamLeader = teamLeaderDao.getById(id);
-        System.out.println("Team-leader with id - " + id);
+        LOGGER.info("Team-leader with get by id + "+id);
         return teamLeader;
     }
 
 
-    @RequestMapping(value = "/{name}", method = RequestMethod.GET)
-    public List<TeamLeader> getByName(@PathVariable String name) {
-        List<TeamLeader> teamLeaders = teamLeaderDao.getByName(name);
-        System.out.println("Team-leader with name - " + name);
-        return teamLeaders;
+    @RequestMapping(value = "name/{name}", method = RequestMethod.GET)
+    public SearchData getByName(@PathVariable String name) {
+
+        SearchData searchData = new SearchData();
+        searchData.setResponse(teamLeaderDao.getByName(name));
+        LOGGER.info("List of team-leaders with name "+name);
+        return searchData;
     }
 
 
     @RequestMapping(value = "/{id}" , method = RequestMethod.DELETE)
     public boolean delete(@PathVariable String id) {
         boolean status = teamLeaderDao.delete(id);
-        System.out.println("Team-leader is successfully deleted");
+        LOGGER.info("Teamleader is deleted successfully !!!");
         return status;
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     public boolean update(@PathVariable String id, @RequestBody TeamLeader teamLeader) {
         boolean status = teamLeaderDao.update(id, teamLeader);
-        System.out.println("Team-leader is successfully updated");
+        LOGGER.info("Team-leader with id "+id+"is successfully updated !!!");
         return status;
     }
 
@@ -94,6 +97,5 @@ public class TeamLeaderController {
     }
 
 }
-
 
 

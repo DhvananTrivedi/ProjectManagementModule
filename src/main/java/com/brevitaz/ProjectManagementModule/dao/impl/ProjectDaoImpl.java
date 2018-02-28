@@ -1,5 +1,7 @@
 package com.brevitaz.ProjectManagementModule.dao.impl;
 
+import com.brevitaz.ProjectManagementModule.config.ClientConfig;
+import com.brevitaz.ProjectManagementModule.config.ObjectMapperProvider;
 import com.brevitaz.ProjectManagementModule.dao.ProjectDao;
 import com.brevitaz.ProjectManagementModule.model.Project;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -36,27 +38,30 @@ public class ProjectDaoImpl implements ProjectDao {
 
 
     @Autowired
-    RestHighLevelClient client;
+    private ClientConfig client;
 
     @Autowired
-    Environment environment;
+    private Environment environment;
 
-    private ObjectMapper mapper = new ObjectMapper();
+    @Autowired
+    private ObjectMapperProvider mapper;
 
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(ProjectDaoImpl.class);
 
+    private static final String TYPE = "doc";
 
     public boolean insert(Project project){
         IndexRequest request = new IndexRequest(
-                environment.getProperty("elasticsearch.index.projects"),environment.getProperty("elasticsearch.type.doc"),project.getId()
-        );
+                environment.getProperty("elasticsearch.index.projects"),TYPE,project.getId());
+
+        mapper.getInstance().setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
         //exec
         try {
 
-            String json = mapper.writeValueAsString(project);
+            String json = mapper.getInstance().writeValueAsString(project);
             request.source(json, XContentType.JSON);
-            IndexResponse response = client.index(request);
+            IndexResponse response = client.getClient().index(request);
             return ((response.status()+"").equals("CREATED")||(response.status()+"").equals("OK"));
 
         } catch (IOException e) {
@@ -69,10 +74,10 @@ public class ProjectDaoImpl implements ProjectDao {
 
         //init
         DeleteRequest deleteRequest = new DeleteRequest(
-                environment.getProperty("elasticsearch.index.projects"), environment.getProperty("elasticsearch.type.doc"), id);
+                environment.getProperty("elasticsearch.index.projects"), TYPE, id);
 
         try {
-            DeleteResponse response = client.delete(deleteRequest);
+            DeleteResponse response = client.getClient().delete(deleteRequest);
             LOGGER.info("Delete response status -"+response.status());
             return (response.status() + "").equals("OK");
 
@@ -87,12 +92,11 @@ public class ProjectDaoImpl implements ProjectDao {
     public Project getById(String id)
     {
         GetRequest request = new GetRequest(
-                environment.getProperty("elasticsearch.index.projects"),environment.getProperty("elasticsearch.type.doc"),id
-        );
+                environment.getProperty("elasticsearch.index.projects"),TYPE,id);
 
         try {
-            GetResponse getResponse=client.get(request);
-            Project project  = mapper.readValue(getResponse.getSourceAsString(), Project.class);
+            GetResponse getResponse=client.getClient().get(request);
+            Project project  = mapper.getInstance().readValue(getResponse.getSourceAsString(), Project.class);
             return project;
         } catch (IOException e) {
             e.printStackTrace();
@@ -105,15 +109,15 @@ public class ProjectDaoImpl implements ProjectDao {
 
         List<Project> projects = new ArrayList<>();
         SearchRequest searchRequest = new SearchRequest( environment.getProperty("elasticsearch.index.projects"));
-        searchRequest.types(environment.getProperty("elasticsearch.type.doc"));
+        searchRequest.types(TYPE);
 
         try {
-            SearchResponse searchResponse = client.search(searchRequest);
+            SearchResponse searchResponse = client.getClient().search(searchRequest);
             SearchHit[] hits = searchResponse.getHits().getHits();
 
             Project project;
             for (SearchHit hit : hits) {
-                project = mapper.readValue(hit.getSourceAsString(), Project.class);
+                project = mapper.getInstance().readValue(hit.getSourceAsString(), Project.class);
                 projects.add(project);
             }
         } catch (IOException ioe) {
@@ -137,10 +141,10 @@ public class ProjectDaoImpl implements ProjectDao {
         try {
             searchSourceBuilder.query(matchQueryBuilder);
             request.source(searchSourceBuilder);
-            SearchResponse response = client.search(request);
+            SearchResponse response = client.getClient().search(request);
             SearchHits hits = response.getHits();
             for (SearchHit hit : hits) {
-                Project project = mapper.readValue(hit.getSourceAsString(), Project.class);
+                Project project = mapper.getInstance().readValue(hit.getSourceAsString(), Project.class);
                 System.out.println(project);
                 projects.add(project);
             }
@@ -156,16 +160,14 @@ public class ProjectDaoImpl implements ProjectDao {
 
         // init
         UpdateRequest request = new UpdateRequest(
-                environment.getProperty("elasticsearch.index.projects"),environment.getProperty("elasticsearch.type.doc"),id);
-        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+                environment.getProperty("elasticsearch.index.projects"),TYPE,id);
+        mapper.getInstance().setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
         //exec
         try {
-
-            System.out.println("HELLO");
-            String json = mapper.writeValueAsString(project);
+            String json = mapper.getInstance().writeValueAsString(project);
             request.doc(json,XContentType.JSON);
-            UpdateResponse response = client.update(request);
+            UpdateResponse response = client.getClient().update(request);
             return (""+response.status()).equals("OK");
         } catch (IOException e) {
             e.printStackTrace();
@@ -193,10 +195,10 @@ public class ProjectDaoImpl implements ProjectDao {
         try {
             searchSourceBuilder.query(matchQueryBuilder);
             request.source(searchSourceBuilder);
-            SearchResponse response = client.search(request);
+            SearchResponse response = client.getClient().search(request);
             SearchHits hits = response.getHits();
             for (SearchHit hit : hits) {
-                Project project = mapper.readValue(hit.getSourceAsString(), Project.class);
+                Project project = mapper.getInstance().readValue(hit.getSourceAsString(), Project.class);
                 System.out.println(project);
                 projects.add(project);
             }

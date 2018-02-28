@@ -57,13 +57,25 @@ public class TeamLeaderDaoImplTest {
     }
 
     @Test
-    public void testUpdate()/*****************/
+    public void testUpdate()
     {
         TeamLeader teamLeader = new TeamLeader();
         teamLeader.setName("aabbcc");
-        boolean status = teamLeaderDao.update("7899", teamLeader);
-        System.out.println(status);
-        Assert.assertEquals(true, status);
+        teamLeader.setId("2255");
+        teamLeaderDao.insert(teamLeader);
+        System.out.println(teamLeader);
+
+        TeamLeader teamLeader2 = new TeamLeader();
+        teamLeader2.setName("Dhvanan");
+        System.out.println(teamLeader2);
+
+        boolean status = teamLeaderDao.update("2255", teamLeader2);
+        TeamLeader teamLeader1 = teamLeaderDao.getById("2255");
+        System.out.println(teamLeader1);
+        Assert.assertEquals("2255",teamLeader1.getId());
+        Assert.assertEquals("Dhvanan",teamLeader1.getName());
+
+        teamLeaderDao.delete("2255");
     }
 
     @Test

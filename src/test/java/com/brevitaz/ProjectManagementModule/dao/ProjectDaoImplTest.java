@@ -62,13 +62,26 @@ public class ProjectDaoImplTest {
             }
         }
 
-        @Test//*************************
+        @Test
         public void testUpdate() {
             Project project = new Project();
+            project.setId("114455");
             project.setName("abcd project");
-            boolean status = projectDao.update("2", project);
+            projectDao.insert(project);
+
+            Project project1 = new Project();
+            project1.setName("AAA project");
+
+            boolean status = projectDao.update("114455", project1);
             System.out.println(status);
-            Assert.assertEquals(true, status);
+
+            Project project2 = projectDao.getById("114455");
+            System.out.println(project2);
+            Assert.assertEquals("AAA project",project2.getName());
+            Assert.assertEquals("114455",project2.getId());
+
+            projectDao.delete("114455");
+
         }
 
         @Test

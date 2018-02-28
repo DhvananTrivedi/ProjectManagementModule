@@ -3,7 +3,9 @@ package com.brevitaz.ProjectManagementModule.controller;
 import com.brevitaz.ProjectManagementModule.dao.ProjectDao;
 import com.brevitaz.ProjectManagementModule.model.Involvement;
 import com.brevitaz.ProjectManagementModule.model.Project;
+import com.brevitaz.ProjectManagementModule.model.SearchData;
 import com.brevitaz.ProjectManagementModule.model.TeamMember;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
@@ -23,49 +25,54 @@ public class ProjectController {
     @Autowired
     ProjectDao projectDao;
 
+    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(ProjectController.class);
+
+
     @RequestMapping(method = RequestMethod.POST)
     public boolean add(@RequestBody Project project){
         boolean status = projectDao.insert(project);
-        System.out.println(" Project added!");
+        LOGGER.info("Project is added successfully !!!");
         return status;
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public List<Project> getAll()
+    public SearchData getAll()
     {
-        List<Project> projects = projectDao.getAll();
-        System.out.println("View all projects.");
-        return projects;
+        SearchData searchData = new SearchData();
+        searchData.setResponse(projectDao.getAll());
+        LOGGER.info("All projects are listed !!!");
+        return searchData;
     }
 
     @RequestMapping(value="/{id}",method = RequestMethod.GET)
     public Project getById(@PathVariable String projectId)
     {
         Project project = projectDao.getById(projectId);
-        System.out.println("Project - BY ID");
+        LOGGER.info("Project with get by id + "+projectId);
         return project;
     }
 
-    @RequestMapping(value="/{name}",method = RequestMethod.GET)
-    public List<Project> getByName(@PathVariable String projectName)
+    @RequestMapping(value="/name/{name}",method = RequestMethod.GET)
+    public SearchData getByName(@PathVariable String projectName)
     {
-        List<Project> projects = projectDao.getByName(projectName);
-        System.out.println("Projects - GET BY NAME ");
-        return projects;
+        SearchData searchData = new SearchData();
+        searchData.setResponse(projectDao.getByName(projectName));
+        LOGGER.info("List of projects with name "+projectName);
+        return searchData;
     }
 
     @RequestMapping(value="/{id}",method = RequestMethod.DELETE)
     public boolean delete(@PathVariable String projectId)
     {
         boolean status = projectDao.delete(projectId);
-        System.out.println("Projects - DELETE");
+        LOGGER.info("Project is deleted successfully !!!");
         return status;
     }
 
     public boolean update(@PathVariable String projectId , @RequestBody Project project)
     {
         boolean status = projectDao.update(projectId,project);
-        System.out.println("Projects - UPDATE");
+        LOGGER.info("Project with id "+projectId+"is successfully updated !!!");
         return status;
     }
 

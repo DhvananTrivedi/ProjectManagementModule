@@ -9,7 +9,6 @@ public class Involvement {
     String id;
     Project project;
     int involvementPercentage;
-    //TeamMember teamMember;
 
     public String getId() {
         return id;

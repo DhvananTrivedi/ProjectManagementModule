@@ -62,11 +62,21 @@ public class TeamMemberDaoImplTest {
     {
         TeamMember teamMember = new TeamMember();
         teamMember.setName("aabbcc");
-        teamMember.setTeamName("ABC");
-        boolean status = teamMemberDao.update("778899",teamMember);
+        teamMember.setId("2233");
+        teamMemberDao.insert(teamMember);
+
+        TeamMember teamMember2  = new TeamMember();
+        teamMember2.setName("Adhishree Adiecha");
+
+        boolean status = teamMemberDao.update("2233",teamMember2);
         System.out.println(status);
-        Assert.assertEquals(true,status);
+
+        TeamMember teamMember1 = teamMemberDao.getById("2233");
+        System.out.println(teamMember1);
+
+        teamMemberDao.delete("2233");
     }
+
 
     @Test
     public void testGetById()
