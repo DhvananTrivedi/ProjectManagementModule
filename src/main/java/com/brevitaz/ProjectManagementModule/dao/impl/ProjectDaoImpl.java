@@ -2,7 +2,6 @@ package com.brevitaz.ProjectManagementModule.dao.impl;
 
 import com.brevitaz.ProjectManagementModule.dao.ProjectDao;
 import com.brevitaz.ProjectManagementModule.model.Project;
-import com.brevitaz.ProjectManagementModule.model.TeamMember;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.elasticsearch.action.delete.DeleteRequest;
@@ -49,7 +48,7 @@ public class ProjectDaoImpl implements ProjectDao {
 
     public boolean insert(Project project){
         IndexRequest request = new IndexRequest(
-                environment.getProperty("request.projectIndex"),environment.getProperty("request.type"),project.getId()
+                environment.getProperty("elasticsearch.index.projects"),environment.getProperty("elasticsearch.type.doc"),project.getId()
         );
 
         //exec
@@ -70,7 +69,7 @@ public class ProjectDaoImpl implements ProjectDao {
 
         //init
         DeleteRequest deleteRequest = new DeleteRequest(
-                environment.getProperty("request.projectIndex"), environment.getProperty("request.type"), id);
+                environment.getProperty("elasticsearch.index.projects"), environment.getProperty("elasticsearch.type.doc"), id);
 
         try {
             DeleteResponse response = client.delete(deleteRequest);
@@ -88,7 +87,7 @@ public class ProjectDaoImpl implements ProjectDao {
     public Project getById(String id)
     {
         GetRequest request = new GetRequest(
-                environment.getProperty("request.projectIndex"),environment.getProperty("request.type"),id
+                environment.getProperty("elasticsearch.index.projects"),environment.getProperty("elasticsearch.type.doc"),id
         );
 
         try {
@@ -105,8 +104,8 @@ public class ProjectDaoImpl implements ProjectDao {
     {
 
         List<Project> projects = new ArrayList<>();
-        SearchRequest searchRequest = new SearchRequest( environment.getProperty("request.projectIndex"));
-        searchRequest.types(environment.getProperty("request.type"));
+        SearchRequest searchRequest = new SearchRequest( environment.getProperty("elasticsearch.index.projects"));
+        searchRequest.types(environment.getProperty("elasticsearch.type.doc"));
 
         try {
             SearchResponse searchResponse = client.search(searchRequest);
@@ -127,7 +126,7 @@ public class ProjectDaoImpl implements ProjectDao {
         ///init
         List<Project> projects = new ArrayList<>();
         SearchRequest request = new SearchRequest(
-                environment.getProperty("request.projectIndex"));
+                environment.getProperty("elasticsearch.index.projects"));
         ///request.types(environment.getProperty("request.type"));
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         QueryBuilder matchQueryBuilder = QueryBuilders.matchQuery("name", name)
@@ -157,7 +156,7 @@ public class ProjectDaoImpl implements ProjectDao {
 
         // init
         UpdateRequest request = new UpdateRequest(
-                environment.getProperty("request.projectIndex"),environment.getProperty("request.type"),id);
+                environment.getProperty("elasticsearch.index.projects"),environment.getProperty("elasticsearch.type.doc"),id);
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
         //exec

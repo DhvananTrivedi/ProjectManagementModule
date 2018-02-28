@@ -50,7 +50,7 @@ public class TeamMemberDaoImpl implements TeamMemberDao {
     public boolean insert(TeamMember teamMember ){
 
         IndexRequest request = new IndexRequest(
-                environment.getProperty("request.teamMemberIndex"),environment.getProperty("request.type"),teamMember.getId()
+                environment.getProperty("elasticsearch.index.teammembers"),environment.getProperty("elasticsearch.type.doc"),teamMember.getId()
         );
 
         //exec
@@ -71,7 +71,7 @@ public class TeamMemberDaoImpl implements TeamMemberDao {
 
         //init
         DeleteRequest deleteRequest = new DeleteRequest(
-                environment.getProperty("request.teamMemberIndex"), environment.getProperty("request.type"), id);
+                environment.getProperty("elasticsearch.index.teammembers"), environment.getProperty("elasticsearch.type.doc"), id);
 
         try {
             DeleteResponse response = client.delete(deleteRequest);
@@ -89,7 +89,7 @@ public class TeamMemberDaoImpl implements TeamMemberDao {
     public TeamMember getById(String id)
     {
         GetRequest request = new GetRequest(
-                environment.getProperty("request.teamMemberIndex"),environment.getProperty("request.type"),id
+                environment.getProperty("elasticsearch.index.teammembers"),environment.getProperty("elasticsearch.type.doc"),id
         );
 
         try {
@@ -106,8 +106,8 @@ public class TeamMemberDaoImpl implements TeamMemberDao {
     {
 
         List<TeamMember> teamMembers = new ArrayList<>();
-        SearchRequest searchRequest = new SearchRequest( environment.getProperty("request.teamMemberIndex"));
-        searchRequest.types(environment.getProperty("request.type"));
+        SearchRequest searchRequest = new SearchRequest( environment.getProperty("elasticsearch.index.teammembers"));
+        searchRequest.types(environment.getProperty("elasticsearch.type.doc"));
 
         try {
             SearchResponse searchResponse = client.search(searchRequest);
@@ -128,7 +128,7 @@ public class TeamMemberDaoImpl implements TeamMemberDao {
         ///init
         List<TeamMember> teamMembers = new ArrayList<>();
         SearchRequest request = new SearchRequest(
-                environment.getProperty("request.teamMemberIndex"));
+                environment.getProperty("elasticsearch.index.teammembers"));
         ///request.types(environment.getProperty("request.type"));
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         QueryBuilder matchQueryBuilder = QueryBuilders.matchQuery("name", name)
@@ -158,7 +158,7 @@ public class TeamMemberDaoImpl implements TeamMemberDao {
 
         // init
         UpdateRequest request = new UpdateRequest(
-                environment.getProperty("request.teamMemberIndex"),environment.getProperty("request.type"),id);
+                environment.getProperty("elasticsearch.index.teammembers"),environment.getProperty("elasticsearch.type.doc"),id);
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
         //exec

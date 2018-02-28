@@ -2,7 +2,6 @@ package com.brevitaz.ProjectManagementModule.dao.impl;
 
 import com.brevitaz.ProjectManagementModule.dao.InvolvementDao;
 import com.brevitaz.ProjectManagementModule.model.Involvement;
-import com.brevitaz.ProjectManagementModule.model.Project;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.elasticsearch.action.delete.DeleteRequest;
@@ -49,7 +48,7 @@ public class InvolvementDaoImpl implements InvolvementDao{
 
     public boolean insert(Involvement involvement){
         IndexRequest request = new IndexRequest(
-                environment.getProperty("request.involvementIndex"),environment.getProperty("request.type"),involvement.getId()
+                environment.getProperty("elasticsearch.index.involvements"),environment.getProperty("elasticsearch.type.doc"),involvement.getId()
         );
 
         try {
@@ -68,7 +67,7 @@ public class InvolvementDaoImpl implements InvolvementDao{
     public boolean delete(String id){
 
         DeleteRequest deleteRequest = new DeleteRequest(
-                environment.getProperty("request.involvementIndex"), environment.getProperty("request.type"), id);
+                environment.getProperty("elasticsearch.index.involvements"), environment.getProperty("elasticsearch.type.doc"), id);
 
         try {
             DeleteResponse response = client.delete(deleteRequest);
@@ -85,7 +84,7 @@ public class InvolvementDaoImpl implements InvolvementDao{
     public Involvement getById(String id)
     {
         GetRequest request = new GetRequest(
-                environment.getProperty("request.involvementIndex"),environment.getProperty("request.type"),id
+                environment.getProperty("elasticsearch.index.involvements"),environment.getProperty("elasticsearch.type.doc"),id
         );
 
         try {
@@ -102,8 +101,8 @@ public class InvolvementDaoImpl implements InvolvementDao{
     {
 
         List<Involvement> involvements = new ArrayList<>();
-        SearchRequest searchRequest = new SearchRequest( environment.getProperty("request.involvementIndex"));
-        searchRequest.types(environment.getProperty("request.type"));
+        SearchRequest searchRequest = new SearchRequest( environment.getProperty("elasticsearch.index.involvements"));
+        searchRequest.types(environment.getProperty("elasticsearch.type.doc"));
 
         try {
             SearchResponse searchResponse = client.search(searchRequest);
@@ -124,7 +123,7 @@ public class InvolvementDaoImpl implements InvolvementDao{
         ///init
         List<Involvement> involvements = new ArrayList<>();
         SearchRequest request = new SearchRequest(
-                environment.getProperty("request.involvementIndex"));
+                environment.getProperty("elasticsearch.index.involvements"));
         ///request.types(environment.getProperty("request.type"));
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         QueryBuilder matchQueryBuilder = QueryBuilders.matchQuery("name", name)
@@ -155,7 +154,7 @@ public class InvolvementDaoImpl implements InvolvementDao{
 
         // init
         UpdateRequest request = new UpdateRequest(
-                environment.getProperty("request.involvementIndex"),environment.getProperty("request.type"),id);
+                environment.getProperty("elasticsearch.index.involvements"),environment.getProperty("elasticsearch.type.doc"),id);
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
         //exec
