@@ -1,9 +1,7 @@
 package com.brevitaz.ProjectManagementModule.dao.impl;
 
 import com.brevitaz.ProjectManagementModule.dao.TeamLeaderDao;
-import com.brevitaz.ProjectManagementModule.dao.TeamMemberDao;
 import com.brevitaz.ProjectManagementModule.model.TeamLeader;
-import com.brevitaz.ProjectManagementModule.model.TeamMember;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.elasticsearch.action.delete.DeleteRequest;
@@ -50,7 +48,7 @@ public class TeamLeaderDaoImpl implements TeamLeaderDao{
     public boolean insert(TeamLeader teamLeader){
 
         IndexRequest request = new IndexRequest(
-                environment.getProperty("request.teamLeaderIndex"),environment.getProperty("request.type"),teamLeader.getId());
+                environment.getProperty("elasticsearch.index.teamleaders"),environment.getProperty("elasticsearch.type.doc"),teamLeader.getId());
 
         try {
 
@@ -69,7 +67,7 @@ public class TeamLeaderDaoImpl implements TeamLeaderDao{
 
         //init
         DeleteRequest deleteRequest = new DeleteRequest(
-                environment.getProperty("request.teamLeaderIndex"), environment.getProperty("request.type"), id);
+                environment.getProperty("elasticsearch.index.teamleaders"), environment.getProperty("elasticsearch.type.doc"), id);
 
         try {
             DeleteResponse response = client.delete(deleteRequest);
@@ -87,7 +85,7 @@ public class TeamLeaderDaoImpl implements TeamLeaderDao{
     public TeamLeader getById(String id)
     {
         GetRequest request = new GetRequest(
-                environment.getProperty("request.teamLeaderIndex"),environment.getProperty("request.type"),id
+                environment.getProperty("elasticsearch.index.teamleaders"),environment.getProperty("elasticsearch.type.doc"),id
         );
 
         try {
@@ -104,8 +102,8 @@ public class TeamLeaderDaoImpl implements TeamLeaderDao{
     {
 
         List<TeamLeader> teamLeaders = new ArrayList<>();
-        SearchRequest searchRequest = new SearchRequest( environment.getProperty("request.teamLeaderIndex"));
-        searchRequest.types(environment.getProperty("request.type"));
+        SearchRequest searchRequest = new SearchRequest( environment.getProperty("elasticsearch.index.teamleaders"));
+        searchRequest.types(environment.getProperty("elasticsearch.type.doc"));
 
         try {
             SearchResponse searchResponse = client.search(searchRequest);
@@ -126,7 +124,7 @@ public class TeamLeaderDaoImpl implements TeamLeaderDao{
         ///init
         List<TeamLeader> teamLeaders = new ArrayList<>();
         SearchRequest request = new SearchRequest(
-                environment.getProperty("request.teamLeaderIndex"));
+                environment.getProperty("elasticsearch.index.teamleaders"));
         ///request.types(environment.getProperty("request.type"));
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         QueryBuilder matchQueryBuilder = QueryBuilders.matchQuery("name", name)
@@ -156,7 +154,7 @@ public class TeamLeaderDaoImpl implements TeamLeaderDao{
     public boolean update(String id,TeamLeader teamLeader){
 
         UpdateRequest request = new UpdateRequest(
-                environment.getProperty("request.teamLeaderIndex"),environment.getProperty("request.type"),id);
+                environment.getProperty("elasticsearch.index.teamleaders"),environment.getProperty("elasticsearch.type.doc"),id);
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
         try {
