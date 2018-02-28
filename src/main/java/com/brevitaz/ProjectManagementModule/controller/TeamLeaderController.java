@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/teamleader")
+@RequestMapping("/teamleaders")
 public class TeamLeaderController {
 
 
@@ -29,7 +29,7 @@ public class TeamLeaderController {
     @RequestMapping(method = RequestMethod.POST)
     public boolean insert(@RequestBody TeamLeader teamLeader) {
         boolean status = teamLeaderDao.insert(teamLeader);
-        System.out.println("Team leader added successfully !!");
+        System.out.println("Team leader is added successfully !!");
         return status;
     }
 
@@ -42,7 +42,7 @@ public class TeamLeaderController {
     }
 
 
-    @RequestMapping(value = "byId/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public TeamLeader getById(@PathVariable String id) {
         TeamLeader teamLeader = teamLeaderDao.getById(id);
         System.out.println("Team-leader with id - " + id);
@@ -50,7 +50,7 @@ public class TeamLeaderController {
     }
 
 
-    @RequestMapping(value = "byName/{name}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{name}", method = RequestMethod.GET)
     public List<TeamLeader> getByName(@PathVariable String name) {
         List<TeamLeader> teamLeaders = teamLeaderDao.getByName(name);
         System.out.println("Team-leader with name - " + name);
@@ -58,49 +58,42 @@ public class TeamLeaderController {
     }
 
 
-    @RequestMapping(method = RequestMethod.DELETE)
+    @RequestMapping(value = "/{id}" , method = RequestMethod.DELETE)
     public boolean delete(@PathVariable String id) {
         boolean status = teamLeaderDao.delete(id);
         System.out.println("Team-leader is successfully deleted");
         return status;
     }
 
-    @RequestMapping(value = "update/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     public boolean update(@PathVariable String id, @RequestBody TeamLeader teamLeader) {
         boolean status = teamLeaderDao.update(id, teamLeader);
         System.out.println("Team-leader is successfully updated");
         return status;
     }
 
-}
-
-
 
     ////////////////////////////////////////////////////////////////////////////////////
-    /*
-    @RequestMapping(value = "/{teamMemberId}/project/{projectId}",method = RequestMethod.GET)
-    List<Project> getInvolvement(@PathVariable String teamMemberId,@PathVariable String projectId)
-    {
+
+    @RequestMapping(value = "/{teamMemberId}/project/{projectId}", method = RequestMethod.GET)
+    List<Project> getInvolvement(@PathVariable String teamMemberId, @PathVariable String projectId) {
         System.out.println("Opens the involvement % of the member in the particular project.");
         return null;
     }
 
-    @RequestMapping(value = "/{teamMemberId}/project/{projectId}",method = RequestMethod.POST)
-    List<Project> setInvolvement(@PathVariable String teamMemberId, @PathVariable String projectId, @RequestBody Involvement involvement)
-    {
+    @RequestMapping(value = "/{teamMemberId}/project/{projectId}", method = RequestMethod.POST)
+    List<Project> setInvolvement(@PathVariable String teamMemberId, @PathVariable String projectId, @RequestBody Involvement involvement) {
         System.out.println("Sets a new involvement to the team member.");
         return null;
     }
 
-    @RequestMapping(value = "/{teamMemberId}/project/{projectId}",method = RequestMethod.PUT)
-    List<Project> updateInvolvement(@PathVariable String teamMemberId, @PathVariable String projectId, @RequestBody Involvement involvement)
-    {
+    @RequestMapping(value = "/{teamMemberId}/project/{projectId}", method = RequestMethod.PUT)
+    List<Project> updateInvolvement(@PathVariable String teamMemberId, @PathVariable String projectId, @RequestBody Involvement involvement) {
         System.out.println("Updates involvement");
         return null;
     }
 
-*/
-
+}
 
 
 

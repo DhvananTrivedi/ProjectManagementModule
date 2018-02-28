@@ -43,4 +43,17 @@ public class Involvement {
                 ", involvementPercentage=" + involvementPercentage +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Involvement that = (Involvement) o;
+
+        if (involvementPercentage != that.involvementPercentage) return false;
+        if (id != null ? !id.equals(that.id) : that.id != null) return false;
+        return project != null ? project.equals(that.project) : that.project == null;
+    }
+
 }

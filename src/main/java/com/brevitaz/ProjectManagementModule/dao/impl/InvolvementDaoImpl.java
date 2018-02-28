@@ -82,7 +82,6 @@ public class InvolvementDaoImpl implements InvolvementDao{
 
     }
 
-
     public Involvement getById(String id)
     {
         GetRequest request = new GetRequest(
@@ -162,7 +161,6 @@ public class InvolvementDaoImpl implements InvolvementDao{
         //exec
         try {
 
-            System.out.println("HELLO");
             String json = mapper.writeValueAsString(involvement);
             request.doc(json,XContentType.JSON);
             UpdateResponse response = client.update(request);
@@ -173,8 +171,5 @@ public class InvolvementDaoImpl implements InvolvementDao{
         }
 
     }
-
-
-
 
 }

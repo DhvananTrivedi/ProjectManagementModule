@@ -176,7 +176,37 @@ public class ProjectDaoImpl implements ProjectDao {
     }
 
 
+    @Override
+    public List<Project> getByTeamMemberId(String id) {
 
 
+       List<Project> projects = new ArrayList<>();
 
+        SearchRequest request = new SearchRequest(
+                environment.getProperty("request.projectIndex"));
+
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        QueryBuilder matchQueryBuilder = QueryBuilders.matchQuery("teamMembers.id", id)
+                .fuzziness(Fuzziness.AUTO)
+                .prefixLength(3)
+                .maxExpansions(10);
+        //exec
+        try {
+            searchSourceBuilder.query(matchQueryBuilder);
+            request.source(searchSourceBuilder);
+            SearchResponse response = client.search(request);
+            SearchHits hits = response.getHits();
+            for (SearchHit hit : hits) {
+                Project project = mapper.readValue(hit.getSourceAsString(), Project.class);
+                System.out.println(project);
+                projects.add(project);
+            }
+        }
+        catch(IOException ioE){
+            System.out.println(ioE);
+            return null;
+        }
+        return projects;
+
+    }
 }

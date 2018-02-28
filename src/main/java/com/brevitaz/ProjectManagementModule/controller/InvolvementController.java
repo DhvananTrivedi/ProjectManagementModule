@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/involvement")
+@RequestMapping("/involvements")
 public class InvolvementController {
 
     @Autowired
@@ -23,7 +23,7 @@ public class InvolvementController {
         return status;
     }
 
-    @RequestMapping(method = RequestMethod.DELETE)
+    @RequestMapping(value="/{id}",method = RequestMethod.DELETE)
     public boolean delete(@PathVariable String id){
 
         boolean status = involvementDao.delete(id);
@@ -31,7 +31,7 @@ public class InvolvementController {
         return status;
     }
 
-    @RequestMapping(value="update/{id}",method = RequestMethod.PUT)
+    @RequestMapping(value="/{id}",method = RequestMethod.PUT)
     public boolean update(@PathVariable String id , @RequestBody Involvement involvement){
         boolean status = involvementDao.update(id,involvement);
         System.out.println(" Involvement - UPDATE !");
@@ -46,7 +46,7 @@ public class InvolvementController {
         return involvements;
     }
 
-    @RequestMapping(value="byId/{id}",method = RequestMethod.GET)
+    @RequestMapping(value="/{id}",method = RequestMethod.GET)
     public Involvement geyById(@PathVariable String id){
 
         Involvement involvement = involvementDao.getById(id);

@@ -16,6 +16,7 @@ public interface ProjectDao {
     public List<Project> getAll();
     public List<Project> getByName(String name);
     public boolean update(String id,Project project);
+    public List<Project> getByTeamMemberId(String id);
 
 
     }

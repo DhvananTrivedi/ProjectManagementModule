@@ -16,7 +16,7 @@ import java.util.List;
  * @project ProjectManagementModule
  **/
 @RestController
-@RequestMapping("/project")
+@RequestMapping("/projects")
 public class ProjectController {
 
 
@@ -38,13 +38,39 @@ public class ProjectController {
         return projects;
     }
 
-    @RequestMapping(value="byId/{id}",method = RequestMethod.GET)
-    public Project getById(@PathVariable String id)
+    @RequestMapping(value="/{id}",method = RequestMethod.GET)
+    public Project getById(@PathVariable String projectId)
     {
-        Project project = projectDao.getById(id);
+        Project project = projectDao.getById(projectId);
         System.out.println("Project - BY ID");
         return project;
     }
+
+    @RequestMapping(value="/{name}",method = RequestMethod.GET)
+    public List<Project> getByName(@PathVariable String projectName)
+    {
+        List<Project> projects = projectDao.getByName(projectName);
+        System.out.println("Projects - GET BY NAME ");
+        return projects;
+    }
+
+    @RequestMapping(value="/{id}",method = RequestMethod.DELETE)
+    public boolean delete(@PathVariable String projectId)
+    {
+        boolean status = projectDao.delete(projectId);
+        System.out.println("Projects - DELETE");
+        return status;
+    }
+
+    public boolean update(@PathVariable String projectId , @RequestBody Project project)
+    {
+        boolean status = projectDao.update(projectId,project);
+        System.out.println("Projects - UPDATE");
+        return status;
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+
 
     @RequestMapping(value = "/allocate-employees",method = RequestMethod.POST)
     public boolean allocateEmployees(@RequestBody List employees)
@@ -52,6 +78,7 @@ public class ProjectController {
         System.out.println("Allocating employees to project");
         return true;
     }
+
 
     @RequestMapping(value = "/allocate-employees/assign-involvement",method = RequestMethod.POST)
     boolean assignInvolvement(@RequestBody List employees)

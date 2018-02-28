@@ -7,6 +7,7 @@ import com.brevitaz.ProjectManagementModule.model.Project;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.xml.bind.SchemaOutputResolver;
 import java.util.List;
 
 /**
@@ -15,7 +16,7 @@ import java.util.List;
  **/
 
 @RestController
-@RequestMapping("/team-member")
+@RequestMapping("/team-members")
 public class TeamMemberController {
 
 
@@ -36,7 +37,41 @@ public class TeamMemberController {
         return teamMembers;
     }
 
-    @RequestMapping(value = "byId/{id}",method = RequestMethod.GET)
+    @RequestMapping(value="/{id}" , method=RequestMethod.GET)
+    public TeamMember getById(@PathVariable String teamMemberId)
+    {
+        TeamMember teamMember = teamMemberDao.getById(teamMemberId);
+        System.out.println("Get particular team member with using id ");
+        return teamMember;
+    }
+
+    @RequestMapping(value = "/{name}" , method=RequestMethod.GET)
+    public List<TeamMember> getByName(@PathVariable String teamMemberName)
+    {
+        List<TeamMember> teamMembers = teamMemberDao.getByName(teamMemberName);
+        System.out.println("Team members with name - "+ teamMemberName);
+        return teamMembers;
+    }
+
+    @RequestMapping(value = "/{id}" ,method=RequestMethod.PUT)
+    public boolean update(@PathVariable String id , @RequestBody TeamMember teamMember)
+    {
+        boolean status = teamMemberDao.update(id,teamMember);
+        System.out.println("team member is updated with particular Id -"+id);
+        return status;
+    }
+
+    @RequestMapping(value = "/{id}" ,method=RequestMethod.DELETE)
+    public boolean delete(@PathVariable String id )
+    {
+        boolean status = teamMemberDao.delete(id);
+        System.out.println("Team member of id "+id+" is deleted");
+        return status;
+    }
+
+
+    //////////////////////////////////////////////////////////////////
+    @RequestMapping(value = "/{id}",method = RequestMethod.GET)
     public List<Project> getProjects(@PathVariable String teamMemberId)
     {
 

@@ -82,4 +82,37 @@ public class Project {
     public void setState(String state) {
         this.state = state;
     }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Project project = (Project) o;
+
+        if (id != null ? !id.equals(project.id) : project.id != null) return false;
+        if (name != null ? !name.equals(project.name) : project.name != null) return false;
+        if (technologies != null ? !technologies.equals(project.technologies) : project.technologies != null)
+            return false;
+        if (assignDate != null ? !assignDate.equals(project.assignDate) : project.assignDate != null) return false;
+        if (dueDate != null ? !dueDate.equals(project.dueDate) : project.dueDate != null) return false;
+        if (teamMembers != null ? !teamMembers.equals(project.teamMembers) : project.teamMembers != null) return false;
+        if (teamLeader != null ? !teamLeader.equals(project.teamLeader) : project.teamLeader != null) return false;
+        return state != null ? state.equals(project.state) : project.state == null;
+    }
+
+    @Override
+    public String toString() {
+        return "Project{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", technologies=" + technologies +
+                ", assignDate=" + assignDate +
+                ", dueDate=" + dueDate +
+                ", teamMembers=" + teamMembers +
+                ", teamLeader=" + teamLeader +
+                ", state='" + state + '\'' +
+                '}';
+    }
 }

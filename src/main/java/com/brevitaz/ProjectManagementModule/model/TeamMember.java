@@ -13,7 +13,7 @@ public class TeamMember {
     List<Project> projects;
     List<Involvement> involvements;
     String designation;
-    String teamName;
+    String teamName; //List<String> teams
 
     public String getId() {
         return id;
@@ -74,4 +74,20 @@ public class TeamMember {
                 ", teamName='" + teamName + '\'' +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        TeamMember that = (TeamMember) o;
+
+        if (id != null ? !id.equals(that.id) : that.id != null) return false;
+        if (name != null ? !name.equals(that.name) : that.name != null) return false;
+        if (projects != null ? !projects.equals(that.projects) : that.projects != null) return false;
+        if (involvements != null ? !involvements.equals(that.involvements) : that.involvements != null) return false;
+        if (designation != null ? !designation.equals(that.designation) : that.designation != null) return false;
+        return teamName != null ? teamName.equals(that.teamName) : that.teamName == null;
+    }
+
 }

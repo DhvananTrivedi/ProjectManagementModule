@@ -11,6 +11,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.List;
 
+import static org.hamcrest.CoreMatchers.hasItems;
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
 public class TeamMemberDaoImplTest {
@@ -24,17 +26,35 @@ public class TeamMemberDaoImplTest {
         TeamMember teamMember = new TeamMember();
         teamMember.setId("778899");
         teamMember.setName("Adhishree");
-        boolean status = teamMemberDao.insert(teamMember);
-        System.out.println(status);
-        Assert.assertEquals(true,status);
+        boolean insertStatus = teamMemberDao.insert(teamMember);
+
+        TeamMember expectedTeamLeader = teamMemberDao.getById("778899");
+        Assert.assertEquals(expectedTeamLeader,teamMember);
+
+        boolean deleteStatus = teamMemberDao.delete("778899");
+        Assert.assertEquals(true,deleteStatus);
 
     }
 
     @Test
     public void testDelete()
     {
-        boolean status = teamMemberDao.delete("8899");
-        Assert.assertEquals(true,status);
+        TeamMember teamMember = new TeamMember();
+        teamMember.setId("114455");
+        teamMember.setName("Dhvanan");
+        boolean insertStatus = teamMemberDao.insert(teamMember);
+
+        boolean deleteStatus = teamMemberDao.delete("114455");
+        Assert.assertEquals(true,deleteStatus);
+
+        try{
+
+            TeamMember expectedTeamMember = teamMemberDao.getById("114455");
+
+        }catch(Exception ex)
+        {
+            System.out.println("This ID has been already deleted");
+        }
     }
 
     @Test
@@ -51,29 +71,59 @@ public class TeamMemberDaoImplTest {
     @Test
     public void testGetById()
     {
-        TeamMember teamMember = teamMemberDao.getById("7788");
-        System.out.println(teamMember);
-        Assert.assertNotNull(teamMember);
+        TeamMember teamMember = new TeamMember();
+        teamMember.setId("1122");
+        teamMember.setName("Adhishree");
+        boolean insertStatus = teamMemberDao.insert(teamMember);
+
+        TeamMember expectedTeamMember = teamMemberDao.getById("1122");
+        Assert.assertEquals(expectedTeamMember,teamMember);
+
+        boolean deleteStatus = teamMemberDao.delete("1122");
+        Assert.assertEquals(true,deleteStatus);
     }
 
     @Test
     public void testGetByName()
     {
-        List<TeamMember> teamMembers = teamMemberDao.getByName("Adhishree");
+        TeamMember teamMember = new TeamMember();
+        teamMember.setId("8899");
+        teamMember.setName("Dhvanan");
+        teamMemberDao.insert(teamMember);
+
+        TeamMember teamMember1 = new TeamMember();
+        teamMember1.setId("7788");
+        teamMember1.setName("Dhvanan Trivedi");
+        teamMemberDao.insert(teamMember1);
+
+
+        List<TeamMember> teamMembers = teamMemberDao.getByName("Dhvanan Trivedi");
         System.out.println("TEAM MEMBERS : "+teamMembers);
-        Assert.assertNotNull(teamMembers);
+        Assert.assertThat(teamMembers,hasItems(teamMember,teamMember1));
     }
 
     @Test
     public void testGetAll()
     {
+        TeamMember teamMember = new TeamMember();
+        teamMember.setId("4455");
+        teamMember.setName("Adhishree Adiecha");
+        boolean insertStatus = teamMemberDao.insert(teamMember);
+        Assert.assertEquals(true,insertStatus);
+
+        TeamMember teamMember1 = new TeamMember();
+        teamMember1.setId("5566");
+        teamMember1.setName("Dhvanan Trivedi");
+        boolean insertStatus1 = teamMemberDao.insert(teamMember1);
+        Assert.assertEquals(true,insertStatus1);
+
+
         List<TeamMember> teamMembers = teamMemberDao.getAll();
         System.out.println(teamMembers);
-        Assert.assertNotNull(teamMembers);
+        System.out.println("size of list-"+teamMembers.size());
+        Assert.assertThat(teamMembers,hasItems(teamMember,teamMember1));
+
     }
-
-
-
 
 
 }
