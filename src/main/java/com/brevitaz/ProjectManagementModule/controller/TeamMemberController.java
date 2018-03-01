@@ -52,8 +52,8 @@ public class TeamMemberController {
         return teamMember;
     }
 
-    @RequestMapping(value = "name/{name}" , method=RequestMethod.GET)
-    public SearchData getByName(@PathVariable String teamMemberName)
+    @RequestMapping(value = "/search" , method=RequestMethod.GET)
+    public SearchData getByName(@RequestBody String teamMemberName)
     {
         SearchData searchData = new SearchData();
         searchData.setResponse(teamMemberDao.getByName(teamMemberName));
