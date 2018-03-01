@@ -52,8 +52,8 @@ public class ProjectController {
         return project;
     }
 
-    @RequestMapping(value="/name/{name}",method = RequestMethod.GET)
-    public SearchData getByName(@PathVariable String projectName)
+    @RequestMapping(value="/search",method = RequestMethod.POST)
+    public SearchData getByName(@RequestBody String projectName)
     {
         SearchData searchData = new SearchData();
         searchData.setResponse(projectDao.getByName(projectName));
@@ -69,6 +69,7 @@ public class ProjectController {
         return status;
     }
 
+    @RequestMapping(value ="/{id}" , method = RequestMethod.PUT)
     public boolean update(@PathVariable String projectId , @RequestBody Project project)
     {
         boolean status = projectDao.update(projectId,project);

@@ -110,6 +110,10 @@ public class TeamMemberDaoImplTest {
         List<TeamMember> teamMembers = teamMemberDao.getByName("Dhvanan Trivedi");
         System.out.println("TEAM MEMBERS : "+teamMembers);
         Assert.assertThat(teamMembers,hasItems(teamMember,teamMember1));
+
+        teamMemberDao.delete("8899");
+        teamMemberDao.delete("7788");
+
     }
 
     @Test
@@ -132,6 +136,9 @@ public class TeamMemberDaoImplTest {
         System.out.println(teamMembers);
         System.out.println("size of list-"+teamMembers.size());
         Assert.assertThat(teamMembers,hasItems(teamMember,teamMember1));
+
+        teamMemberDao.delete("4455");
+        teamMemberDao.delete("5566");
 
     }
 

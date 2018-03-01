@@ -79,13 +79,7 @@ public class TeamMemberController {
 
 
     //////////////////////////////////////////////////////////////////
-   /* @RequestMapping(value = "/{id}",method = RequestMethod.GET)
-    public List<Project> getProjects(@PathVariable String teamMemberId)
-    {
 
-        System.out.println("Opens the particular employee's list of involved Projects.");
-        return null;
-    }*/
 
     @RequestMapping(value = "/{teamMemberId}/project/{projectId}",method = RequestMethod.GET)
     public List<Project> getInvolvement(@PathVariable String teamMemberId,@PathVariable String projectId)

@@ -14,7 +14,7 @@ public class Project {
     List<String> technologies;
     Date assignDate;
     Date dueDate;
-    List<TeamMember> teamMembers; /// Can be refactored with a List of TeamMember Class Objects.
+    List<TeamMember> teamMembers;
     TeamLeader teamLeader;
     String state;
 

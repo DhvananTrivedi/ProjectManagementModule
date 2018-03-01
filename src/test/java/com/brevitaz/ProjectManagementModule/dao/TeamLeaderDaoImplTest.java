@@ -49,10 +49,12 @@ public class TeamLeaderDaoImplTest {
 
         try{
             TeamLeader expectedTeamLeader = teamLeaderDao.getById("222");
+            Assert.assertEquals(true,false);
         }
         catch(NullPointerException ex)
         {
             System.out.println("This ID has been already deleted");
+            Assert.assertEquals(true,true);
         }
     }
 
@@ -133,6 +135,9 @@ public class TeamLeaderDaoImplTest {
         System.out.println(teamLeaders);
 
         Assert.assertThat(teamLeaders,hasItems(teamLeader,teamLeader1));
+
+        teamLeaderDao.delete("4455");
+        teamLeaderDao.delete("5566");
     }
 
 

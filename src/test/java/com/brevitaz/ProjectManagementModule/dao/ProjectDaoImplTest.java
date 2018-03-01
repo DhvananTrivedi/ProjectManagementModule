@@ -146,6 +146,7 @@ public class ProjectDaoImplTest {
                 Assert.assertThat(p.getTeamMembers(),hasItems(teamMember,teamMember1));
             }
 
+            projectDao.delete("11");
         }
 
         @Test
@@ -167,6 +168,9 @@ public class ProjectDaoImplTest {
             System.out.println("PROJECT LIST : " + projects);
 
             Assert.assertThat(projects,hasItems(project,project1));
+
+            projectDao.delete("4455");
+            projectDao.delete("5566");
     }
 
 }
